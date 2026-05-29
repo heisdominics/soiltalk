@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoilTalk — Shazam for Soil</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brown: #3B2A1A;
+    --earth: #6B4C2A;
+    --clay: #C47B3A;
+    --lime: #A8C63D;
+    --lime-dark: #6B8A1A;
+    --cream: #F7F2E8;
+    --white: #FFFFFF;
+    --text: #1A1208;
+    --muted: #6B5A40;
+    --tag-bg: #EAF0C6;
+    --tag-text: #4A6010;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 2rem;
+    background: var(--cream);
+    border-bottom: 1px solid rgba(107,76,42,0.15);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.4rem; color: var(--brown);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-dot { width: 10px; height: 10px; background: var(--lime); border-radius: 50%; display: inline-block; }
+  nav a {
+    font-size: 0.9rem; color: var(--muted); text-decoration: none;
+    font-weight: 500; transition: color 0.2s;
+  }
+  nav a:hover { color: var(--brown); }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-cta {
+    background: var(--brown); color: var(--cream) !important;
+    padding: 0.5rem 1.2rem; border-radius: 100px;
+    font-weight: 500 !important;
+  }
+  .nav-cta:hover { background: var(--earth); }
+  .hero {
+    padding: 5rem 2rem 4rem;
+    max-width: 900px; margin: 0 auto;
+    text-align: center;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--tag-bg); color: var(--tag-text);
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.05em;
+    padding: 0.35rem 0.9rem; border-radius: 100px;
+    margin-bottom: 2rem; text-transform: uppercase;
+  }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--lime-dark); border-radius: 50%; }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 800; line-height: 1.05;
+    color: var(--brown);
+    margin-bottom: 1.5rem;
+  }
+  h1 span { color: var(--clay); }
+  .hero-sub {
+    font-size: 1.15rem; line-height: 1.7;
+    color: var(--muted); max-width: 580px; margin: 0 auto 2.5rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--brown); color: var(--cream);
+    padding: 0.85rem 2rem; border-radius: 100px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--earth); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent; color: var(--brown);
+    padding: 0.85rem 2rem; border-radius: 100px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+    text-decoration: none; border: 1.5px solid var(--earth);
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(107,76,42,0.08); }
+  .visual-section {
+    max-width: 700px; margin: 3rem auto;
+    padding: 0 2rem;
+  }
+  .soil-visual {
+    background: var(--brown);
+    border-radius: 24px; padding: 2.5rem;
+    display: flex; gap: 2rem; align-items: center;
+    flex-wrap: wrap;
+  }
+  .probe-icon {
+    width: 80px; height: 120px;
+    background: var(--clay);
+    border-radius: 8px 8px 40px 40px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding-top: 12px; gap: 6px; flex-shrink: 0;
+    position: relative;
+  }
+  .probe-led { width: 10px; height: 10px; background: var(--lime); border-radius: 50%; }
+  .probe-body { width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
+  .probe-tip {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 18px solid var(--clay);
+  }
+  .readings {
+    flex: 1; min-width: 200px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .reading-row { display: flex; flex-direction: column; gap: 4px; }
+  .reading-label { font-size: 0.75rem; color: rgba(247,242,232,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
+  .reading-bar-bg { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+  .reading-bar { height: 8px; border-radius: 4px; }
+  .reading-val { font-size: 0.85rem; color: var(--cream); font-weight: 500; }
+  .result-bubble {
+    background: var(--lime); color: var(--brown);
+    border-radius: 16px; padding: 1rem 1.25rem;
+    font-size: 0.9rem; font-weight: 500; line-height: 1.5;
+    flex: 1; min-width: 160px;
+  }
+  .result-bubble strong { display: block; font-size: 1rem; margin-bottom: 0.3rem; }
+  .timer-badge {
+    display: inline-block; margin-top: 0.75rem;
+    background: var(--brown); color: var(--cream);
+    font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 100px;
+  }
+  .stats { display: flex; gap: 1rem; max-width: 700px; margin: 0 auto 4rem; padding: 0 2rem; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1; min-width: 140px;
+    background: var(--white); border-radius: 16px;
+    padding: 1.25rem; border: 1px solid rgba(107,76,42,0.12);
+  }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--brown); }
+  .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.4; }
+  .section { max-width: 700px; margin: 0 auto 5rem; padding: 0 2rem; }
+  .section-tag {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--clay); font-weight: 500; margin-bottom: 0.75rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800; color: var(--brown); line-height: 1.15;
+    margin-bottom: 2rem;
+  }
+  .steps { display: flex; flex-direction: column; gap: 1rem; }
+  .step {
+    display: flex; gap: 1.25rem; align-items: flex-start;
+    background: var(--white); border-radius: 16px;
+    padding: 1.25rem 1.5rem; border: 1px solid rgba(107,76,42,0.1);
+  }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--cream); border: 2px solid var(--clay);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem;
+    color: var(--clay); flex-shrink: 0;
+  }
+  .step-text h3 { font-size: 1rem; font-weight: 500; color: var(--brown); margin-bottom: 0.25rem; }
+  .step-text p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .problem-section {
+    background: var(--brown); border-radius: 24px;
+    padding: 3rem 2.5rem;
+    max-width: 700px; margin-left: auto; margin-right: auto;
+    margin-bottom: 5rem;
+  }
+  .problem-section .section-tag { color: var(--clay); }
+  .problem-section h2 { color: var(--cream); }
+  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+  .problem-card {
+    background: rgba(255,255,255,0.06); border-radius: 12px;
+    padding: 1.25rem; border: 1px solid rgba(255,255,255,0.08);
+  }
+  .problem-card h4 { font-size: 1rem; color: var(--lime); font-weight: 500; margin-bottom: 0.4rem; }
+  .problem-card p { font-size: 0.85rem; color: rgba(247,242,232,0.7); line-height: 1.6; }
+  .waitlist-section { max-width: 700px; margin: 0 auto 5rem; padding: 0 2rem; text-align: center; }
+  .waitlist-box {
+    background: var(--lime); border-radius: 24px;
+    padding: 3rem 2rem;
+  }
+  .waitlist-box h2 { color: var(--brown); margin-bottom: 0.75rem; }
+  .waitlist-box p { color: var(--lime-dark); font-size: 1rem; margin-bottom: 2rem; }
+  .waitlist-form { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+  .waitlist-form input {
+    padding: 0.8rem 1.25rem; border-radius: 100px;
+    border: none; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
+    background: var(--white); color: var(--brown); width: 260px; outline: none;
+  }
+  .waitlist-form input::placeholder { color: var(--muted); }
+  footer {
+    border-top: 1px solid rgba(107,76,42,0.15);
+    padding: 2rem; text-align: center;
+    font-size: 0.85rem; color: var(--muted);
+  }
+  footer strong { color: var(--brown); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero > * { animation: fadeUp 0.6s ease both; }
+  .hero-tag { animation-delay: 0.05s; }
+  h1 { animation-delay: 0.15s; }
+  .hero-sub { animation-delay: 0.25s; }
+  .hero-actions { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><span class="logo-dot"></span> SoilTalk</div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#problem">Problem</a>
+    <a href="#waitlist" class="nav-cta">Join waitlist</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">Mechanovia · Nigeria & West Africa</div>
+  <h1>Shazam for<br><span>your soil.</span></h1>
+  <p class="hero-sub">SoilTalk is a $5 acoustic probe + smartphone app that reveals soil health in 30 seconds — moisture, compaction, nutrients — with AI-powered advice in your local language. No lab needed.</p>
+  <div class="hero-actions">
+    <a href="#waitlist" class="btn-primary">Join the waitlist</a>
+    <a href="#how" class="btn-secondary">See how it works</a>
+  </div>
+</section>
+
+<div class="visual-section">
+  <div class="soil-visual">
+    <div style="position:relative; margin-bottom: 16px;">
+      <div class="probe-icon">
+        <div class="probe-led"></div>
+        <div class="probe-body"></div>
+        <div class="probe-body"></div>
+        <div class="probe-body"></div>
+        <div class="probe-tip"></div>
+      </div>
+    </div>
+    <div class="readings">
+      <div class="reading-row">
+        <div style="display:flex; justify-content:space-between;">
+          <span class="reading-label">Moisture</span>
+          <span class="reading-val">62%</span>
+        </div>
+        <div class="reading-bar-bg"><div class="reading-bar" style="width:62%; background: #5DCAA5;"></div></div>
+      </div>
+      <div class="reading-row">
+        <div style="display:flex; justify-content:space-between;">
+          <span class="reading-label">Compaction</span>
+          <span class="reading-val">Low</span>
+        </div>
+        <div class="reading-bar-bg"><div class="reading-bar" style="width:25%; background: #A8C63D;"></div></div>
+      </div>
+      <div class="reading-row">
+        <div style="display:flex; justify-content:space-between;">
+          <span class="reading-label">Nitrogen</span>
+          <span class="reading-val">Medium</span>
+        </div>
+        <div class="reading-bar-bg"><div class="reading-bar" style="width:50%; background: #EF9F27;"></div></div>
+      </div>
+    </div>
+    <div class="result-bubble">
+      <strong>🌱 Soil looks good!</strong>
+      Efọ soil dey healthy. Add small nitrogen fertilizer before planting maize. Rain dey come Thursday — good time to plant.
+      <span class="timer-badge">⏱ 30 seconds</span>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-num">33M+</div>
+    <div class="stat-label">smallholder farmers in Nigeria</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">$5</div>
+    <div class="stat-label">target probe cost at scale</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">30s</div>
+    <div class="stat-label">to a full soil reading</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">offline — no data needed</div>
+  </div>
+</div>
+
+<div class="problem-section" id="problem">
+  <div class="section-tag">The problem</div>
+  <h2>Farmers are flying blind on their most important input.</h2>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <h4>Soil tests cost too much</h4>
+      <p>Lab tests cost ₦15,000–₦30,000 and take weeks. Most smallholders never get one in their lifetime.</p>
+    </div>
+    <div class="problem-card">
+      <h4>Wrong inputs, wasted money</h4>
+      <p>Without soil data, farmers over-apply or under-apply fertilizer — losing up to 40% of yield potential.</p>
+    </div>
+    <div class="problem-card">
+      <h4>Advice isn't local</h4>
+      <p>Existing agri-apps give generic English tips. Most farmers need advice in Yoruba, Hausa, or Igbo to act on it.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="how">
+  <div class="section-tag">How it works</div>
+  <h2>Three steps from ground to guidance.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <h3>Push the probe into the soil</h3>
+        <p>The $5 acoustic SoilTalk probe emits sound pulses into the earth. No batteries — it draws power from your phone's headphone jack or USB-C.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <h3>Open the app and press scan</h3>
+        <p>The app captures acoustic return signals in under 30 seconds. Our AI model — fully on-device — interprets compaction, moisture levels, and nutrient density.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <h3>Get advice in your language</h3>
+        <p>Plain-language recommendations delivered in Yoruba, Hausa, Igbo, or Pidgin. What to plant, how much to fertilize, when to water — tailored to your crop and region.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="waitlist-section" id="waitlist">
+  <div class="waitlist-box">
+    <h2>Be first to know when we launch.</h2>
+    <p>We're piloting with smallholder farmers in Oyo and Kaduna States in 2026. Join the waitlist.</p>
+    <div class="waitlist-form">
+      <input type="email" id="waitlist-email" placeholder="Your email or WhatsApp number" />
+      <button class="btn-primary" style="border: none;" onclick="submitWaitlist()">Get early access</button>
+    </div>
+    <p id="waitlist-msg" style="margin-top:1rem; font-size:0.9rem; color:var(--brown); display:none;"></p>
+  </div>
+</div>
+
+<footer>
+  <strong>SoilTalk</strong> — Soil intelligence for every farmer. &nbsp;·&nbsp; Lagos, Nigeria &nbsp;·&nbsp; <a href="mailto:hello@soiltalk.app" style="color: var(--clay); text-decoration: none;">hello@soiltalk.app</a>
+</footer>
+
+
+
+
+<script>
+async function submitWaitlist() {
+  var input = document.getElementById('waitlist-email');
+  var msg = document.getElementById('waitlist-msg');
+  var val = input.value.trim();
+  if (!val) {
+    msg.style.display = 'block';
+    msg.textContent = 'Please enter your email or WhatsApp number.';
+    return;
+  }
+  msg.style.display = 'block';
+  msg.textContent = 'Submitting...';
+  fetch('https://formspree.io/f/xkoeevrb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ email: val })
+  }).then(function(res) {
+    if (res.ok) {
+      input.value = '';
+      msg.textContent = 'You are on the list! We will be in touch soon.';
+    } else {
+      msg.textContent = 'Something went wrong. Please try again.';
+    }
+  }).catch(function() {
+    msg.textContent = 'Something went wrong. Please try again.';
+  });
+}
+</script>
+</body>
+</html>
